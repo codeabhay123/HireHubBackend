@@ -13,15 +13,23 @@ import companyRoutes from "./routes/company.route.js";
 
 const app = express();
 
-// ✅ Enable CORS for frontend (remove trailing /)
+// ✅ Enable CORS for frontend (Vercel + Local Dev)
 app.use(cors({
-  origin: "https://hire-h-ub-frontend-a7v7.vercel.app", 
-  credentials: true, // allow cookies/authorization headers
+  origin: [
+    "https://hire-h-ub-frontend-a7v7.vercel.app",
+    "http://localhost:5173"
+  ],
+  credentials: true,
 }));
 
 // ✅ Middlewares
 app.use(express.json());
 app.use(cookieParser());
+
+// ✅ Health check route
+app.get("/", (req, res) => {
+  res.send("✅ Backend is running");
+});
 
 // ✅ Routes
 app.use("/api/v1/user", userRoutes);
@@ -39,4 +47,7 @@ mongoose.connect(process.env.MONGO_URI)
       console.log(`🚀 Server running on http://localhost:${PORT}`);
     });
   })
-  .catch((err) => console.error("❌ MongoDB connection failed:", err));
+  .catch((err) => {
+    console.error("❌ MongoDB connection failed:", err.message);
+    process.exit(1);
+  });
