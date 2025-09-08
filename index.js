@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-dotenv.config();   // ✅ load env first
+dotenv.config();   // ✅ Load environment variables
 
 import express from "express";
 import mongoose from "mongoose";
@@ -13,12 +13,13 @@ import companyRoutes from "./routes/company.route.js";
 
 const app = express();
 
-// ✅ Enable CORS before your routes
+// ✅ Enable CORS for frontend (remove trailing /)
 app.use(cors({
-  origin: "http://localhost:5173", // frontend URL
-  credentials: true,               // allow cookies/authorization headers
+  origin: "https://hire-h-ub-frontend-a7v7.vercel.app", 
+  credentials: true, // allow cookies/authorization headers
 }));
 
+// ✅ Middlewares
 app.use(express.json());
 app.use(cookieParser());
 
@@ -29,11 +30,13 @@ app.use("/api/v1/job", jobRoute);
 app.use("/api/v1/application", applicationRoute);
 
 // ✅ MongoDB + Server
+const PORT = process.env.PORT || 8080;
+
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log("✅ MongoDB connected");
-    app.listen(process.env.PORT, () => {
-      console.log(`🚀 Server running on http://localhost:${process.env.PORT}`);
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on http://localhost:${PORT}`);
     });
   })
-  .catch((err) => console.error(err));
+  .catch((err) => console.error("❌ MongoDB connection failed:", err));
