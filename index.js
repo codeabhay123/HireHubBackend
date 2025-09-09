@@ -13,13 +13,22 @@ import companyRoutes from "./routes/company.route.js";
 
 const app = express();
 
-// ✅ Enable CORS for frontend (Vercel + Local Dev)
+// ✅ Enable CORS (Production + Local + Preview)
 app.use(cors({
-  origin: [
-    "https://hire-h-ub-frontend-a7v7.vercel.app",
-    "http://localhost:5173"
-  ],
+  origin: (origin, callback) => {
+    if (
+      !origin || // allow Postman / curl / mobile apps (no origin header)
+      origin === "http://localhost:5173" || // local dev
+      origin === "https://hire-h-ub-frontend-1z3e.vercel.app" || // production frontend
+      origin.endsWith(".vercel.app") // allow all Vercel preview deployments
+    ) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
 }));
 
 // ✅ Middlewares
